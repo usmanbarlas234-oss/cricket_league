@@ -1,5 +1,9 @@
 import csv
 
+from dugout.models import Player, FantasyTeam
+
+
+
 from dugout.models import Player
 
 
@@ -11,3 +15,19 @@ def load_players(path):
             player = Player.from_row(row)
             players[player.player_id] = player
     return players
+
+
+def team_from_row(row, players):
+    """Build one FantasyTeam from a row of a teams CSV."""
+    team = FantasyTeam(row["team_name"], row["owner"])
+    for player_id in row["players"].split(";"):
+        team.add_player(players[player_id.strip()])
+    team.set_captain(players[row["captain"]], players[row["vice_captain"]])
+    return team
+
+
+def load_team(path, players):
+    """Return the first team in a teams CSV file."""
+    with open(path, newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            return team_from_row(row, players)
