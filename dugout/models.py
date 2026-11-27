@@ -5,6 +5,12 @@ from dugout.rules import (
     check_roles,
     check_captains,
 )
+from dugout.errors import InvalidTeamError, PlayerNotFoundError
+def find_player(players, player_id):
+    """Return the Player with this id, or raise PlayerNotFoundError."""
+    if player_id not in players:
+        raise PlayerNotFoundError(player_id)
+    return players[player_id]
 
 class Player:
     """One real cricketer in the PSL player list."""
@@ -74,7 +80,11 @@ class FantasyTeam:
         errors.extend(check_roles(self))
         errors.extend(check_captains(self))
         return errors
-
+    def validate(self):
+        """Raise InvalidTeamError if the team breaks any rule."""
+        problems = self.check_rules()
+        if problems:
+            raise InvalidTeamError(self.team_name, problems)
 
     def __str__(self):
         size = len(self.players)

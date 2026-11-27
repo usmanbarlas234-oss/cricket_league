@@ -26,12 +26,38 @@
 #     print(" -", error)
 
 
+# from dugout.loader import load_players, load_team
+
+# players = load_players("data/players.csv")
+# team = load_team("data/my_team.csv", players)
+
+# print(team)
+# print("Captain:", team.captain)
+# print("Vice-captain:", team.vice_captain)
+# print("Errors:", team.check_rules())
+
 from dugout.loader import load_players, load_team
+from dugout.models import FantasyTeam, find_player
+from dugout.errors import PlayerNotFoundError, InvalidTeamError
 
 players = load_players("data/players.csv")
-team = load_team("data/my_team.csv", players)
 
-print(team)
-print("Captain:", team.captain)
-print("Vice-captain:", team.vice_captain)
-print("Errors:", team.check_rules())
+# 1. My real team passes validation
+team = load_team("data/my_team.csv", players)
+team.validate()
+print("Legal team:", team)
+
+# 2. A player id that does not exist
+try:
+    find_player(players, "P999")
+except PlayerNotFoundError as error:
+    print("Caught:", error)
+
+# 3. An illegal team
+short = FantasyTeam("Too Short", "Test")
+short.add_player(players["P089"])
+try:
+    short.validate()
+except InvalidTeamError as error:
+    print("Caught:", error)
+    print("Number of problems:", len(error.problems))

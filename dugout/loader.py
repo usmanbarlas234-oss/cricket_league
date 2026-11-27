@@ -1,10 +1,6 @@
 import csv
 
-from dugout.models import Player, FantasyTeam
-
-
-
-from dugout.models import Player
+from dugout.models import Player, FantasyTeam, find_player
 
 
 def load_players(path):
@@ -21,8 +17,11 @@ def team_from_row(row, players):
     """Build one FantasyTeam from a row of a teams CSV."""
     team = FantasyTeam(row["team_name"], row["owner"])
     for player_id in row["players"].split(";"):
-        team.add_player(players[player_id.strip()])
-    team.set_captain(players[row["captain"]], players[row["vice_captain"]])
+        team.add_player(find_player(players, player_id.strip()))
+    team.set_captain(
+        find_player(players, row["captain"]),
+        find_player(players, row["vice_captain"]),
+    )
     return team
 
 
