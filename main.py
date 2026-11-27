@@ -1,23 +1,26 @@
-# from dugout.models import Player
+from dugout.loader import load_players
+from dugout.models import FantasyTeam
 
-# babar = Player("P089", "Babar Azam", "Peshawar Zalmi", "BAT", 10.5)
-# print(babar)
+players = load_players("data/players.csv")
 
-
-from dugout.models import Player, FantasyTeam
-
-babar = Player("P089", "Babar Azam", "Peshawar Zalmi", "BAT", 10.5)
-shaheen = Player("P068", "Shaheen Shah Afridi", "Lahore Qalandars", "BOWL", 10.5)
-rizwan = Player("P122", "Mohammad Rizwan", "Rawalpindiz", "WK", 10.5)
-
+# A legal team
+ids = ["P122", "P089", "P056", "P037", "P065", "P028",
+       "P068", "P066", "P140", "P069", "P101"]
 team = FantasyTeam("Lahore Thunder", "Usman")
-team.add_player(babar)
-team.add_player(shaheen)
-team.add_player(rizwan)
-team.set_captain(babar, shaheen)
+for player_id in ids:
+    team.add_player(players[player_id])
+team.set_captain(players["P089"], players["P068"])
 
 print(team)
-print(team.total_credits())
-print(team.count_by_role())
-print(team.count_by_franchise())
-print(team.captain)
+print("Errors:", team.check_rules())
+
+# An illegal team (only 3 players)
+short = FantasyTeam("Too Short", "Test")
+for player_id in ["P089", "P068", "P122"]:
+    short.add_player(players[player_id])
+short.set_captain(players["P089"], players["P068"])
+
+print()
+print(short)
+for error in short.check_rules():
+    print(" -", error)

@@ -1,3 +1,11 @@
+from dugout.rules import (
+    check_players_count,
+    check_budget,
+    check_franchise_limit,
+    check_roles,
+    check_captains,
+)
+
 class Player:
     """One real cricketer in the PSL player list."""
 
@@ -7,6 +15,17 @@ class Player:
         self.franchise = franchise
         self.role = role
         self.credits = credits
+
+    @classmethod
+    def from_row(cls, row):
+        """Build a Player from one row (dict) of the players CSV."""
+        return cls(
+            row["player_id"],
+            row["name"],
+            row["franchise"],
+            row["role"],
+            float(row["credits"]),
+        )
 
     def __str__(self):
         return f"{self.name} ({self.franchise}, {self.role}, {self.credits} cr)"
@@ -46,6 +65,16 @@ class FantasyTeam:
     def set_captain(self, captain, vice_captain):
         self.captain = captain
         self.vice_captain = vice_captain
+    def check_rules(self):
+        """Return a list of rule violations. An empty list means the team is legal."""
+        errors = []
+        errors.extend(check_players_count(self))
+        errors.extend(check_budget(self))
+        errors.extend(check_franchise_limit(self))
+        errors.extend(check_roles(self))
+        errors.extend(check_captains(self))
+        return errors
+
 
     def __str__(self):
         size = len(self.players)
