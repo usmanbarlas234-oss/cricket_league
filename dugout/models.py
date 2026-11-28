@@ -4,6 +4,7 @@ from dugout.rules import (
     check_franchise_limit,
     check_roles,
     check_captains,
+    check_no_duplicates,
 )
 from dugout.errors import InvalidTeamError, PlayerNotFoundError
 def find_player(players, player_id):
@@ -80,6 +81,7 @@ class FantasyTeam:
         errors.extend(check_franchise_limit(self))
         errors.extend(check_roles(self))
         errors.extend(check_captains(self))
+        errors.extend(check_no_duplicates(self))
         return errors
     
     def validate(self):
