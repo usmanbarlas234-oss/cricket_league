@@ -1,4 +1,12 @@
-from dugout.loader import load_players, load_team, load_teams
+
+from dugout.errors import InvalidTeamError, PlayerNotFoundError
+from dugout.loader import (
+    load_players,
+    load_team,
+    load_teams,
+    read_team_rows,
+    team_from_row,
+)
 from dugout.models import League
 from dugout.rules import MAX_CREDITS
 
@@ -38,7 +46,28 @@ def show_verdict(team):
             print(f"  - {problem}")
     else:
         print("LEGAL")
+def report(team_name, problems):
+    """Print one verdict. An empty list of problems means the team is legal."""
+    if not problems:
+        print(f"  {team_name}: LEGAL")
+        return
 
+    print(f"  {team_name}: REJECTED")
+    for problem in problems:
+        print(f"    - {problem}")
+
+
+def report_on_row(row, players):
+    """Build one team from a CSV row and say whether it is legal."""
+    try:
+        team = team_from_row(row, players)
+        team.validate()
+    except PlayerNotFoundError as error:
+        report(row["team_name"], [str(error)])
+    except InvalidTeamError as error:
+        report(error.team_name, error.problems)
+    else:
+        report(team.team_name, [])
 
 def main():
     players = load_players("data/players.csv")
@@ -67,6 +96,16 @@ def main():
     for team in league.rank_teams():
         verdict = "LEGAL" if not team.check_rules() else "ILLEGAL"
         print(f"{team.team_name:<18} {team.owner:<14} {team.total_credits():>6}  {verdict}")
+
+
+    print("\nThe six teams the league office could not accept")
+    for row in read_team_rows("data/bad_teams.csv"):
+        report_on_row(row, players)
+
+    print("\nDone. Six teams were refused and the program did not crash.")
+
+
+
 
 if __name__ == "__main__":
     main()

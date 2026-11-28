@@ -38,3 +38,8 @@ def load_teams(path, players):
         for row in csv.DictReader(f):
             teams.append(team_from_row(row, players))
     return teams
+
+def read_team_rows(path):
+    """Return the raw rows of a teams CSV file, without building any teams."""
+    with open(path, newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
