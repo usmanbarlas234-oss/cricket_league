@@ -1,17 +1,6 @@
-# from dugout.loader import load_players, load_teams
-
-# players = load_players("data/players.csv")
-# teams = load_teams("data/sample_teams.csv", players)
-
-# print(len(teams))
-# for team in teams:
-#     problems = team.check_rules()
-#     verdict = "LEGAL" if not problems else "ILLEGAL"
-#     print(team.team_name, team.owner, team.total_credits(), verdict)
-
-
-from dugout.loader import load_players, load_teams
+from dugout.loader import load_players, load_team, load_teams
 from dugout.models import League
+from dugout.rules import MAX_CREDITS
 
 
 def show_pool(players):
@@ -40,6 +29,17 @@ def show_team(team):
     print(f"Captain: {team.captain.name} | Vice-captain: {team.vice_captain.name}")
 
 
+def show_verdict(team):
+    """Print LEGAL, or ILLEGAL followed by every problem."""
+    problems = team.check_rules()
+    if problems:
+        print("ILLEGAL:")
+        for problem in problems:
+            print(f"  - {problem}")
+    else:
+        print("LEGAL")
+
+
 def main():
     players = load_players("data/players.csv")
     print(f"Player pool: {len(players)} players")
@@ -48,18 +48,18 @@ def main():
     league = League("Dugout League")
     for team in load_teams("data/sample_teams.csv", players):
         show_team(team)
-        problems = team.check_rules()
-        if problems:
-            print("ILLEGAL:")
-            for problem in problems:
-                print(f"  - {problem}")
-        else:
-            print("LEGAL")
+        show_verdict(team)
         league.add_team(team)
 
     legal = league.legal_teams()
     illegal = len(league.teams) - len(legal)
     print(f"\nSummary: {len(legal)} legal, {illegal} illegal out of {len(league.teams)} teams")
+
+    print("\n===== MY TEAM =====")
+    my_team = load_team("data/my_team.csv", players)
+    show_team(my_team)
+    print(f"Credits left: {MAX_CREDITS - my_team.total_credits()}")
+    show_verdict(my_team)
 
 
 if __name__ == "__main__":
