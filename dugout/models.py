@@ -71,6 +71,7 @@ class FantasyTeam:
     def set_captain(self, captain, vice_captain):
         self.captain = captain
         self.vice_captain = vice_captain
+
     def check_rules(self):
         """Return a list of rule violations. An empty list means the team is legal."""
         errors = []
@@ -80,6 +81,7 @@ class FantasyTeam:
         errors.extend(check_roles(self))
         errors.extend(check_captains(self))
         return errors
+    
     def validate(self):
         """Raise InvalidTeamError if the team breaks any rule."""
         problems = self.check_rules()
@@ -90,3 +92,25 @@ class FantasyTeam:
         size = len(self.players)
         cost = self.total_credits()
         return f"{self.team_name} (owner: {self.owner}, {size} players, {cost} cr)"
+
+class League:
+    """A collection of FantasyTeams, with methods to look up and rank them."""
+
+    def __init__(self, name):
+        self.name = name
+        self.teams = {}  # owner name -> FantasyTeam
+
+    def add_team(self, team):
+        self.teams[team.owner] = team
+
+    def find_team(self, owner):
+        """Return the FantasyTeam for the given owner, or None if not found."""
+        return self.teams.get(owner)
+
+    def legal_teams(self):
+        """Return a list of the teams that break no rules."""
+        return [team for team in self.teams.values() if not team.check_rules()]
+
+    def rank_teams(self):
+        """Return a list of teams sorted by total credits (lowest first)."""
+        return sorted(self.teams.values(), key=lambda team: team.total_credits())
