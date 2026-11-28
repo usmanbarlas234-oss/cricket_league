@@ -4,10 +4,11 @@ from dugout.loader import (
     load_players,
     load_team,
     load_teams,
+    read_team_entries,
     read_team_rows,
     team_from_row,
 )
-from dugout.models import League
+from dugout.models import FantasyTeam, League
 from dugout.rules import MAX_CREDITS
 
 
@@ -36,7 +37,6 @@ def show_team(team):
     print(f"Total credits: {team.total_credits()}")
     print(f"Captain: {team.captain.name} | Vice-captain: {team.vice_captain.name}")
 
-
 def show_verdict(team):
     """Print LEGAL, or ILLEGAL followed by every problem."""
     problems = team.check_rules()
@@ -64,6 +64,18 @@ def report_on_row(row, players):
         team.validate()
     except PlayerNotFoundError as error:
         report(row["team_name"], [str(error)])
+    except InvalidTeamError as error:
+        report(error.team_name, error.problems)
+    else:
+        report(team.team_name, [])
+
+def report_on_entry(entry, players):
+    """The same check as report_on_row, for a team that arrived as JSON."""
+    try:
+        team = FantasyTeam.from_dict(entry, players)
+        team.validate()
+    except PlayerNotFoundError as error:
+        report(entry["team_name"], [str(error)])
     except InvalidTeamError as error:
         report(error.team_name, error.problems)
     else:
@@ -102,10 +114,11 @@ def main():
     for row in read_team_rows("data/bad_teams.csv"):
         report_on_row(row, players)
 
+    print("\nThe same six teams, as they arrive over the API (JSON)")
+    for entry in read_team_entries("data/bad_teams.json"):
+        report_on_entry(entry, players)
+
     print("\nDone. Six teams were refused and the program did not crash.")
-
-
-
 
 if __name__ == "__main__":
     main()
