@@ -61,10 +61,6 @@ def main():
     print(f"Credits left: {MAX_CREDITS - my_team.total_credits()}")
     show_verdict(my_team)
 
-
-
-
-
     league.add_team(my_team)
 
     print("\n===== LEAGUE TABLE (cheapest first) =====")
