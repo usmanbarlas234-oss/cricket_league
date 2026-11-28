@@ -18,7 +18,9 @@ A fantasy cricket league engine for the PSL 2026 season, written in Python.
   - a valid captain and vice-captain who are different players
   - no player picked twice
 - Groups teams in a `League`, and prints a league table ranked by credits
-
+- Raises its own errors (`PlayerNotFoundError`, `InvalidTeamError`) and keeps going when one team is bad
+- Reads real PSL 2026 ball-by-ball match files (JSON) and prints a scorecard
+- Saves teams to JSON and loads them back
 ## Project layout
 
 | Path | What it holds |
@@ -31,11 +33,14 @@ A fantasy cricket league engine for the PSL 2026 season, written in Python.
 | `data/players.csv` | The player pool |
 | `data/sample_teams.csv` | Class teams plus two test teams |
 | `data/my_team.csv` | My own XI |
+| `dugout/matches.py` | Reading a real match file: runs, balls, top scorers |
+| `match_report.py` | Prints a scorecard from one match file |
 
 ## How to run
 
 ```
 python main.py
+python match_report.py data/matches/match_01.json
 ```
 
 ## Sample output
