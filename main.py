@@ -57,7 +57,7 @@ def main():
             print("LEGAL")
         league.add_team(team)
 
-        legal = league.legal_teams()
+    legal = league.legal_teams()
     illegal = len(league.teams) - len(legal)
     print(f"\nSummary: {len(legal)} legal, {illegal} illegal out of {len(league.teams)} teams")
 
