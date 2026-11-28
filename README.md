@@ -3,6 +3,7 @@
 A fantasy cricket league engine for the PSL 2026 season, written in Python.
 
 **Author:** Usman Barlas
+
 **Course:** Advanced Python for AI, LiveX Nano Degree, Batch 3 (UMT Lahore), Deliverable 1
 
 ## What it does
