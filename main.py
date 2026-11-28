@@ -62,5 +62,15 @@ def main():
     show_verdict(my_team)
 
 
+
+
+
+    league.add_team(my_team)
+
+    print("\n===== LEAGUE TABLE (cheapest first) =====")
+    for team in league.rank_teams():
+        verdict = "LEGAL" if not team.check_rules() else "ILLEGAL"
+        print(f"{team.team_name:<18} {team.owner:<14} {team.total_credits():>6}  {verdict}")
+
 if __name__ == "__main__":
     main()
