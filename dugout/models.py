@@ -34,6 +34,17 @@ class Player:
             float(row["credits"]),
         )
 
+    def to_dict(self):
+        """Return this player as a dict, ready to be turned into JSON."""
+
+        return {
+            "player_id": self.player_id,
+            "name": self.name,
+            "franchise": self.franchise,
+            "role": self.role,
+            "credits": self.credits,
+        }
+
     def __str__(self):
         return f"{self.name} ({self.franchise}, {self.role}, {self.credits} cr)"
 
@@ -89,6 +100,38 @@ class FantasyTeam:
         problems = self.check_rules()
         if problems:
             raise InvalidTeamError(self.team_name, problems)
+
+    def to_dict(self):
+        """Return this team as a dict of plain values, ready to save as JSON."""
+
+        return {
+            "team_name": self.team_name,
+            "owner": self.owner,
+            "player_ids": [player.player_id for player in self.players],
+            "captain": self.captain.player_id if self.captain else None,
+            "vice_captain": self.vice_captain.player_id if self.vice_captain else None,
+        }
+
+    @classmethod
+    def from_dict(cls, data, players):
+        """Build a FantasyTeam from a dict such as to_dict() produces."""
+
+        team = cls(data["team_name"], data["owner"])
+
+        for player_id in data["player_ids"]:
+            team.add_player(find_player(players, player_id))
+
+        # .get() returns None for a team saved without captains
+        captain_id = data.get("captain")
+        vice_captain_id = data.get("vice_captain")
+
+        if captain_id and vice_captain_id:
+            team.set_captain(
+                find_player(players, captain_id),
+                find_player(players, vice_captain_id),
+            )
+
+        return team
 
     def __str__(self):
         size = len(self.players)
